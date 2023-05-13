@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 module.exports = {
-  solidity: '0.8.10',
+  solidity: '0.8.18',
   networks: {
     hardhat: {},
     mainnet: {
