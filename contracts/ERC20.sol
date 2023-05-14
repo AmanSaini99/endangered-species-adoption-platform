@@ -1,92 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.0.0/contracts/token/ERC20/IERC20.sol
-interface IERC20 {
+import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-    function balanceOf(address account) external view returns (uint);
-
-    function transfer(address recipient, uint amount) external returns (bool);
-
-    function allowance(address owner, address spender) external view returns (uint);
-
-    function approve(address spender, uint amount) external returns (bool);
-
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint amount
-    ) external returns (bool);
-
-    event Transfer(address indexed from, address indexed to, uint value);
-    event Approval(address indexed owner, address indexed spender, uint value);
-}
-
-
-
-//import "./IERC20.sol";
-
-contract ESAP is IERC20 {
-    uint public totalSupply;
-    mapping(address => uint) public balanceOf;
-    mapping(address => mapping(address => uint)) public allowance;
-    string public name = "Endangered Species Adoption Program";
-    string public symbol = "ESAP";
-    uint8 public decimals = 18;
-    //fields
-
-    // events/ errors
-
-    //constructor
-
-    //modfiers
-
-    //functions
-        // - fallbacks/recevie
-        // - custom functions
-        // - selfdestruct
-
-    function transfer(address recipient, uint amount) external returns (bool) {
-        //require(balanceOf[msg.sender] > amount, "insufficient balance");
-        //unchecked {
-            balanceOf[msg.sender] -= amount;
-            balanceOf[recipient] += amount;
-      //  }
-        
-        emit Transfer(msg.sender, recipient, amount);
-        return true;
-    }
-
-    function approve(address spender, uint amount) external returns (bool) {
-        allowance[msg.sender][spender] = amount;
-        emit Approval(msg.sender, spender, amount);
-        return true;
-    }
-
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint amount
-    ) external returns (bool) {
-        allowance[sender][msg.sender] -= amount;
-        balanceOf[sender] -= amount;
-        balanceOf[recipient] += amount;
-        emit Transfer(sender, recipient, amount);
-        return true;
-    }
-
-    function mint(uint amount) external {
-        balanceOf[msg.sender] += amount;
-        totalSupply += amount;
-    }
-
-    function burn(uint amount) external {
-        balanceOf[msg.sender] -= amount;
-        totalSupply -= amount;
-       
-    }
-
-    function destroy() external {
-        selfdestruct(payable(msg.sender));
+contract EndangeredSpeciesToken is ERC20, Ownable {
+    constructor() ERC20("Endangered Species Token", "EST") {}
+    function mint(address recipient, uint256 amount) public  onlyOwner{
+        _mint(recipient, amount);
     }
 }

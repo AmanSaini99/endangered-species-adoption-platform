@@ -5,15 +5,15 @@ async function main() {
     console.log('Deploying contracts with the account: ' + deployer.address);
 
     // Deploy First
-    const First = await hre.ethers.getContractFactory('ESAP');
+    const First = await hre.ethers.getContractFactory('EndangeredSpeciesToken');
     const first = await First.deploy();
 
 
-    const Second = await hre.ethers.getContractFactory('ESAPImpl');
+    const Second = await hre.ethers.getContractFactory('EndangeredSpeciesDapp');
     const second = await Second.deploy();
 
-    // const Third = await hre.ethers.getContractFactory('');
-    // const third = await Third.deploy();
+    const Third = await hre.ethers.getContractFactory('GuardianshipNFT');
+    const third = await Third.deploy();
 
     console.log( "First: " + first.address );
     console.log( "Second: " + second.address );
