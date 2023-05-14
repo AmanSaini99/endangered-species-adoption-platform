@@ -51,7 +51,7 @@ export const User = () => {
     });
   }
 
-  const handleInputChangeOfContribute = (event) => {
+  const handleInputChangeOfDonate = (event) => {
     setdonateToSanctuaryObj({
       ...donateToSanctuaryObj,
       [event.target.name]: event.target.value,
@@ -215,6 +215,7 @@ export const User = () => {
         id: '',
         amount: '',
       });
+      await contractERC20.approve(process.env.REACT_APP_ERC20_ADDRESS, donateToSanctuaryObj.amount);
       const s = await contractMain.donateToSanctuary(
         donateToSanctuaryObj.id,
         donateToSanctuaryObj.amount
@@ -348,122 +349,114 @@ export const User = () => {
           Check Allowance <p>{ccheckallowance}</p>
         </button>
       </div>
-      <div className='MyChild'>
-        <button
-          className='ExpandableButton ExpandableButton--blue'
-          onClick={checkallowance}
-        >
-          Burn Invalid NFTs <p>{burnNFTs}</p>
-        </button>
-      </div>
       <hr />
       <div className='container'>
         <table className='table'>
-        <tbody>
-          <tr>
-            <td>
-              <h1 className='styled-heading'>Create a Sanctuary</h1>
-              <form onSubmit={createSanctuary}>
-                <label className='style-label'>
-                  Name:
-                  <input
-                    type='text'
-                    name='name'
-                    value={newSanctuary.name}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <br />
-                <label className='style-label'>
-                  location:
-                  <input
-                    type='text'
-                    name='location'
-                    value={newSanctuary.location}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <br />
-                <button type='submit'>Create Sanctuary</button>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <h1 className='styled-heading'>Add Animal to Sanctuary</h1>
-              <form onSubmit={addAnimal}>
-                <label className='style-label'>
-                  Name:
-                  <input
-                    type='text'
-                    name='name'
-                    value={newAnimal.name}
-                    onChange={handleChange}
-                  />
-                </label>
-                <br />
-                <label className='style-label'>
-                  Species:
-                  <input
-                    type='text'
-                    name='species'
-                    value={newAnimal.species}
-                    onChange={handleChange}
-                  />
-                </label>
-                <br />
-                <label className='style-label'>
-                  description:
-                  <input
-                    type='text'
-                    name='description'
-                    value={newAnimal.description}
-                    onChange={handleChange}
-                  />
-                </label>
-                <br />
-                <label className='style-label'>
-                  Birthday:
-                  <input
-                    type='text'
-                    name='birthday'
-                    value={newAnimal.birthday}
-                    onChange={handleChange}
-                  />
-                </label>
-                <br />
-                <label className='style-label'>
-                  SanctuaryId:
-                  <input
-                    type='number'
-                    name='sanctuaryId'
-                    value={newAnimal.sanctuaryId}
-                    onChange={handleChange}
-                  />
-                </label>
-                <br />
-                <button type='submit'>Add Animal</button>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td colSpan='2'>
-              <h1 className='styled-heading'>Trasfer ERC20 from Admin </h1>
-              <form onSubmit={transfererc20}>
-                <label className='style-label'>
-                  to:
-                  <input type='text' name='to' />
-                </label>
-                <br />
-                <label>
-                  Amount To transfer:
-                  <input type='number' name='amount' />
-                </label>
-                <br />
-                <button type='submit'>Transfer</button>
-              </form>
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>Donate to Sanctuary</h1>
+                <form onSubmit={donateToSanctuary}>
+                  <label className='style-label'>
+                    Id:
+                    <input
+                      type='number'
+                      name='id'
+                      value={donateToSanctuaryObj.id}
+                      onChange={handleInputChangeOfDonate}
+                    />
+                  </label>
+                  <br />
+                  <label className='style-label'>
+                    Amount:
+                    <input
+                      type='number'
+                      name='amount'
+                      value={donateToSanctuaryObj.amount}
+                      onChange={handleInputChangeOfDonate}
+                    />
+                  </label>
+                  <br />
+                  <button type='submit'>Donate Amount</button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>Add Animal to Sanctuary</h1>
+                <form onSubmit={addAnimal}>
+                  <label className='style-label'>
+                    Name:
+                    <input
+                      type='text'
+                      name='name'
+                      value={newAnimal.name}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  <br />
+                  <label className='style-label'>
+                    Species:
+                    <input
+                      type='text'
+                      name='species'
+                      value={newAnimal.species}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  <br />
+                  <label className='style-label'>
+                    description:
+                    <input
+                      type='text'
+                      name='description'
+                      value={newAnimal.description}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  <br />
+                  <label className='style-label'>
+                    Birthday:
+                    <input
+                      type='text'
+                      name='birthday'
+                      value={newAnimal.birthday}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  <br />
+                  <label className='style-label'>
+                    SanctuaryId:
+                    <input
+                      type='number'
+                      name='sanctuaryId'
+                      value={newAnimal.sanctuaryId}
+                      onChange={handleChange}
+                    />
+                  </label>
+                  <br />
+                  <button type='submit'>Add Animal</button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan='2'>
+                <h1 className='styled-heading'>Trasfer ERC20 from Admin </h1>
+                <form onSubmit={transfererc20}>
+                  <label className='style-label'>
+                    to:
+                    <input type='text' name='to' />
+                  </label>
+                  <br />
+                  <label>
+                    Amount To transfer:
+                    <input type='number' name='amount' />
+                  </label>
+                  <br />
+                  <button type='submit'>Transfer</button>
+                </form>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -473,54 +466,54 @@ export const User = () => {
       </div>
       <div className='container'>
         <table className='table'>
-        <tbody>
-          <tr>
-            <td>
-              <h1 className='styled-heading'>All Sanctuaries</h1>
-              {sanctuaries.map((sanctuary, index) => (
-                <div key={index}>
-                  <h3>Name: {sanctuary.name}</h3>
-                  <h3>ID: {sanctuary.id}</h3>
-                  <p>location: {sanctuary.location}</p>
-                  <p>totalAnimals: {sanctuary.totalAnimals}</p>
-                  <p>totalDonations: {sanctuary.totalDonations}</p>
-                </div>
-              ))}
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>All Sanctuaries</h1>
+                {sanctuaries.map((sanctuary, index) => (
+                  <div key={index}>
+                    <h3>Name: {sanctuary.name}</h3>
+                    <h3>ID: {sanctuary.id}</h3>
+                    <p>location: {sanctuary.location}</p>
+                    <p>totalAnimals: {sanctuary.totalAnimals}</p>
+                    <p>totalDonations: {sanctuary.totalDonations}</p>
+                  </div>
+                ))}
+              </td>
+            </tr>
           </tbody>
         </table>
         <table>
-        <tbody>
-          <tr>
-            <td>
-              <h1 className='styled-heading'>Show Animals In Sanctuary</h1>
-              <form onSubmit={showAnimalsToSanctuary}>
-                <label className='style-label'>
-                  SanctuaryId:
-                  <input type='text' name='sanctuaryId' />
-                </label>
-                <br />
-                <button type='submit'>Show Animals</button>
-              </form>
-            </td>
-            <td >
-              <h1 className='styled-heading'>All Animals In this Sanctuary</h1>
-              {animalsToSanctury.map((animal, index) => (
-                <div key={index}>
-                  <h3>Name: {animal.name}</h3>
-                  <h3>ID: {animal.id}</h3>
-                  <p>Species: {animal.species}</p>
-                  <p>Description: {animal.description}</p>
-                  <p>Birthday: {animal.birthday}</p>
-                  <p>SanctuaryId: {animal.sanctuaryId}</p>
-                  <p>Guardian: {animal.guardian}</p>
-                  <p>GardianshipExpiry: {animal.gardianshipExpiry}</p>
-                  <p>GaurdianshipTokenId: {animal.gaurdianshipTokenId}</p>
-                </div>
-              ))}
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>Show Animals In Sanctuary</h1>
+                <form onSubmit={showAnimalsToSanctuary}>
+                  <label className='style-label'>
+                    SanctuaryId:
+                    <input type='text' name='sanctuaryId' />
+                  </label>
+                  <br />
+                  <button type='submit'>Show Animals</button>
+                </form>
+              </td>
+              <td >
+                <h1 className='styled-heading'>All Animals In this Sanctuary</h1>
+                {animalsToSanctury.map((animal, index) => (
+                  <div key={index}>
+                    <h3>Name: {animal.name}</h3>
+                    <h3>ID: {animal.id}</h3>
+                    <p>Species: {animal.species}</p>
+                    <p>Description: {animal.description}</p>
+                    <p>Birthday: {animal.birthday}</p>
+                    <p>SanctuaryId: {animal.sanctuaryId}</p>
+                    <p>Guardian: {animal.guardian}</p>
+                    <p>GardianshipExpiry: {animal.gardianshipExpiry}</p>
+                    <p>GaurdianshipTokenId: {animal.gaurdianshipTokenId}</p>
+                  </div>
+                ))}
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

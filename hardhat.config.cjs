@@ -20,6 +20,12 @@ module.exports = {
         ? [process.env.PRIVATE_KEY_SEPOLIA]
         : [],
     },
+    ganache: {
+      url: process.env.GANACHE_RPC_URL || '',
+      accounts: process.env.PRIVATE_KEY_GANACHE
+        ? [process.env.PRIVATE_KEY_GANACHE]
+        : [],
+    },
     kovan: {
       url: process.env.KOVAN_RPC_URL || '',
       accounts: process.env.PRIVATE_KEY_KOVAN
