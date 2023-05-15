@@ -175,7 +175,6 @@ export const Admin = () => {
         newSanctuary.name,
         newSanctuary.location,
       );
-      setSanctuaries();
       console.log('create sanctuary : ', s);
     }
     catch (e) {
@@ -351,9 +350,9 @@ export const Admin = () => {
       <div className='MyChild'>
         <button
           className='ExpandableButton ExpandableButton--blue'
-          onClick={checkallowance}
+          onClick={burnNFTs}
         >
-          Burn Invalid NFTs <p>{burnNFTs}</p>
+          Burn Invalid NFTs 
         </button>
       </div>
       <hr />
@@ -439,6 +438,7 @@ export const Admin = () => {
                     name='sanctuaryId'
                     value={newAnimal.sanctuaryId}
                     onChange={handleChange}
+                    min='1'
                   />
                 </label>
                 <br />
@@ -468,59 +468,67 @@ export const Admin = () => {
         </table>
       </div>
       <hr />
-      <div className='MyContainer'>
-        <button onClick={setsanctuaries}>Show Sanctuaries</button>
-      </div>
+      
       <div className='container'>
-        <table className='table'>
-        <tbody>
-          <tr>
-            <td>
-              <h1 className='styled-heading'>All Sanctuaries</h1>
-              {sanctuaries.map((sanctuary, index) => (
-                <div key={index}>
-                  <h3>Name: {sanctuary.name}</h3>
-                  <h3>ID: {sanctuary.id}</h3>
-                  <p>location: {sanctuary.location}</p>
-                  <p>totalAnimals: {sanctuary.totalAnimals}</p>
-                  <p>totalDonations: {sanctuary.totalDonations}</p>
-                </div>
-              ))}
-            </td>
-          </tr>
+      <table className='table'>
+          <tbody>
+            <tr>
+              <td>
+              <div className='MyContainer'>
+                <button onClick={setsanctuaries}>Show All Sanctuaries</button>
+              </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>All Sanctuaries</h1>
+                {sanctuaries.map((sanctuary, index) => (
+                  <div key={index}>
+                    <h3>Name: {sanctuary.name}</h3>
+                    <h3>ID: {sanctuary.id}</h3>
+                    <p>location: {sanctuary.location}</p>
+                    <p>totalAnimals: {sanctuary.totalAnimals}</p>
+                    <p>totalDonations: {sanctuary.totalDonations}</p>
+                  </div>
+                ))}
+              </td>
+            </tr>
           </tbody>
         </table>
+        <br />
         <table>
-        <tbody>
-          <tr>
-            <td>
-              <h1 className='styled-heading'>Show Animals In Sanctuary</h1>
-              <form onSubmit={showAnimalsToSanctuary}>
-                <label className='style-label'>
-                  SanctuaryId:
-                  <input type='text' name='sanctuaryId' />
-                </label>
-                <br />
-                <button type='submit'>Show Animals</button>
-              </form>
-            </td>
-            <td >
-              <h1 className='styled-heading'>All Animals In this Sanctuary</h1>
-              {animalsToSanctury.map((animal, index) => (
-                <div key={index}>
-                  <h3>Name: {animal.name}</h3>
-                  <h3>ID: {animal.id}</h3>
-                  <p>Species: {animal.species}</p>
-                  <p>Description: {animal.description}</p>
-                  <p>Birthday: {animal.birthday}</p>
-                  <p>SanctuaryId: {animal.sanctuaryId}</p>
-                  <p>Guardian: {animal.guardian}</p>
-                  <p>GardianshipExpiry: {animal.gardianshipExpiry}</p>
-                  <p>GaurdianshipTokenId: {animal.gaurdianshipTokenId}</p>
-                </div>
-              ))}
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>Show Animals In Sanctuary</h1>
+                <form onSubmit={showAnimalsToSanctuary}>
+                  <label className='style-label'>
+                    SanctuaryId:
+                    <input type='number' name='sanctuaryId' min='1' />
+                  </label>
+                  <br />
+                  <button type='submit'>Show Animals</button>
+                </form>
+              </td>
+              </tr>
+              <tr>
+              <td >
+                <h1 className='styled-heading'>All Animals In this Sanctuary</h1>
+                {animalsToSanctury.map((animal, index) => (
+                  <div key={index}>
+                    <h3>Name: {animal.name}</h3>
+                    <h3>ID: {animal.id}</h3>
+                    <p>Species: {animal.species}</p>
+                    <p>Description: {animal.description}</p>
+                    <p>Birthday: {animal.birthday}</p>
+                    <p>SanctuaryId: {animal.sanctuaryId}</p>
+                    <p>Guardian: {animal.guardian}</p>
+                    <p>GardianshipExpiry: {animal.gardianshipExpiry}</p>
+                    <p>GaurdianshipTokenId: {animal.gaurdianshipTokenId}</p>
+                  </div>
+                ))}
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

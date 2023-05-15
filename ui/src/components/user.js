@@ -8,10 +8,11 @@ const { ethers } = require("ethers");
 export const User = () => {
   const [sanctuaries, setSanctuaries] = useState([]);
   const [animalsToSanctury, setAnimalsToSanctuary] = useState([]);
+  const [adoptedAnimals, setAdoptedAnimals] = useState([]);
   const [donations, setDonations] = useState([]);
   const [donateToSanctuaryObj, setdonateToSanctuaryObj] = useState({
-    id: '',
-    amount: '',
+    id: 0,
+    amount: 0,
   });
   const [balance, setBalance] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
@@ -24,6 +25,8 @@ export const User = () => {
   const [contractDonation, setContractDonation] = useState({});
   const [signer, setSigner] = useState({});
   const [adminSigner, setAdminSigner] = useState('');
+  const [totalGuardianNFTs, setGuardianNFTs] = useState('');
+  const [donationNFTs, setDonationNFTs] = useState('');
   const [newSanctuary, setNewSanctuary] = useState({
     name: '',
     location: '',
@@ -212,13 +215,14 @@ export const User = () => {
       event.preventDefault();
       setdonateToSanctuaryObj(donateToSanctuaryObj);
       setdonateToSanctuaryObj({
-        id: '',
-        amount: '',
+        id: 0,
+        amount: 0,
       });
-      await contractERC20.approve(process.env.REACT_APP_ERC20_ADDRESS, donateToSanctuaryObj.amount);
+      const amount = (donateToSanctuaryObj.amount * (10 ** 18)).toString();
+      console.log(amount);
       const s = await contractMain.donateToSanctuary(
         donateToSanctuaryObj.id,
-        donateToSanctuaryObj.amount
+        amount,
       );
       console.log('donateToSanctuary : ', s);
     }
@@ -227,20 +231,28 @@ export const User = () => {
     }
   };
 
+  const adoptAnimal = async (event) => {
+    try {
+      event.preventDefault();
+      const s = await contractMain.adoptAnimal(
+        event.target[0].value,
+        event.target[1].value,
+      );
+      console.log('adoptAnimal : ', s);
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
   const aprroveToken = async (event) => {
     try {
       event.preventDefault();
-      if (event.target[1].value) {
-        const p = await contractERC20
-          .connect(signer)
-          .approve(event.target[1].value, event.target[0].value);
-        console.log('approve token : ', p, ' ', BigNumber(p._hex).toString());
-      } else {
-        const p = await contractERC20
-          .connect(signer)
-          .approve(process.env.REACT_APP_Main_ADDRESS, event.target[0].value);
-        console.log('approve money : ', p, ' ', BigNumber(p._hex).toString());
-      }
+      const amount = (event.target[0].value * (10 ** 18)).toString();
+      console.log(amount);
+      const p = await contractERC20
+        .approve(process.env.REACT_APP_MAIN_ADDRESS, amount);
+      console.log('approve money : ', p, ' ', BigNumber(p._hex).toString());
     }
     catch (e) {
       console.error(e);
@@ -250,9 +262,10 @@ export const User = () => {
   const transfererc20 = async (event) => {
     try {
       event.preventDefault();
+      const amount = (event.target[0].value * (10 ** 18)).toString();
+      console.log(amount);
       const p = await contractERC20
-        .connect(adminWallet)
-        .transfer(event.target[0].value, event.target[1].value);
+        .transfer(event.target[0].value, amount);
       console.log('transfer erc20 : ', p);
     }
     catch (e) {
@@ -289,6 +302,35 @@ export const User = () => {
     }
   };
 
+  const showAdoptedAnimals = async (event) => {
+    try {
+      event.preventDefault();
+      const anms = [];
+      const animals = await contractMain.getAlladoptedAnimals();
+      for (let i = 0; i < animals.length; i++) {
+        if (BigNumber(animals[i]._hex) == 0) continue;
+        const animal = await contractMain.getAnimal(animals[i]);
+        const newanimal = {
+          id: BigNumber(animals[i]._hex).toString(),
+          name: animal.name,
+          species: animal.species,
+          description: animal.description,
+          birthday: animal.birthday,
+          sanctuaryId: BigNumber(animal.sanctuaryId._hex).toString(),
+          guardian: animal['gaurdian'],
+          gardianshipExpiry: BigNumber(animal['gardianshipExpiry']._hex).toString(),
+          gaurdianshipTokenId: BigNumber(animal['gaurdianshipTokenId']._hex).toString(),
+        };
+        anms.push(newanimal);
+      }
+
+      await setAdoptedAnimals([...anms]);
+    }
+    catch (e) {
+      console.error(e);
+    }
+  };
+
   const checkallowance = async (event) => {
     try {
       const p = await contractERC20
@@ -301,6 +343,30 @@ export const User = () => {
     }
 
   };
+
+  const totalGuardNFTs = async (event) => {
+    try {
+      const p = await contractGuardian
+        .balanceOf(walletAddress);
+      console.log('check allowance : ', p, ' ', BigNumber(p._hex).toString());
+      setGuardianNFTs(BigNumber(p._hex).toString());
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
+  const totalDonationNFTs = async (event) => {
+    try {
+      const p = await contractDonation
+        .balanceOf(walletAddress);
+      console.log('check allowance : ', p, ' ', BigNumber(p._hex).toString());
+      setDonationNFTs(BigNumber(p._hex).toString());
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
 
   const showbalance = async (event) => {
     try {
@@ -349,10 +415,43 @@ export const User = () => {
           Check Allowance <p>{ccheckallowance}</p>
         </button>
       </div>
+      <div className='MyChild'>
+        <button
+          className='ExpandableButton ExpandableButton--blue'
+          onClick={totalGuardNFTs}
+        >
+          TotalGuardianShipNFTs <p>{totalGuardianNFTs}</p>
+        </button>
+      </div>
+      <div className='MyChild'>
+        <button
+          className='ExpandableButton ExpandableButton--blue'
+          onClick={totalDonationNFTs}
+        >
+          TotalDonationNFTs <p>{donationNFTs}</p>
+        </button>
+      </div>
       <hr />
       <div className='container'>
         <table className='table'>
           <tbody>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>Set Allownace</h1>
+                <form onSubmit={aprroveToken}>
+                  <label className='style-label'>
+                    Amount:
+                    <input
+                      type='number'
+                      name='amount'
+                      min='10'
+                    />
+                  </label>
+                  <br />
+                  <button type='submit'>Approve Allownace</button>
+                </form>
+              </td>
+            </tr>
             <tr>
               <td>
                 <h1 className='styled-heading'>Donate to Sanctuary</h1>
@@ -362,7 +461,8 @@ export const User = () => {
                     <input
                       type='number'
                       name='id'
-                      value={donateToSanctuaryObj.id}
+                      min='1'
+                      // value={donateToSanctuaryObj.id}
                       onChange={handleInputChangeOfDonate}
                     />
                   </label>
@@ -372,7 +472,8 @@ export const User = () => {
                     <input
                       type='number'
                       name='amount'
-                      value={donateToSanctuaryObj.amount}
+                      min='50'
+                      // value={donateToSanctuaryObj.amount}
                       onChange={handleInputChangeOfDonate}
                     />
                   </label>
@@ -383,65 +484,33 @@ export const User = () => {
             </tr>
             <tr>
               <td>
-                <h1 className='styled-heading'>Add Animal to Sanctuary</h1>
-                <form onSubmit={addAnimal}>
+                <h1 className='styled-heading'>Adopt An Animal</h1>
+                <form onSubmit={adoptAnimal}>
                   <label className='style-label'>
-                    Name:
-                    <input
-                      type='text'
-                      name='name'
-                      value={newAnimal.name}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label className='style-label'>
-                    Species:
-                    <input
-                      type='text'
-                      name='species'
-                      value={newAnimal.species}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label className='style-label'>
-                    description:
-                    <input
-                      type='text'
-                      name='description'
-                      value={newAnimal.description}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label className='style-label'>
-                    Birthday:
-                    <input
-                      type='text'
-                      name='birthday'
-                      value={newAnimal.birthday}
-                      onChange={handleChange}
-                    />
-                  </label>
-                  <br />
-                  <label className='style-label'>
-                    SanctuaryId:
+                    Id:
                     <input
                       type='number'
-                      name='sanctuaryId'
-                      value={newAnimal.sanctuaryId}
-                      onChange={handleChange}
+                      name='id'
+                      min='1'
                     />
                   </label>
                   <br />
-                  <button type='submit'>Add Animal</button>
+                  <label className='style-label'>
+                    Months:
+                    <input
+                      type='number'
+                      name='months'
+                      min='1'
+                    />
+                  </label>
+                  <br />
+                  <button type='submit'>Adopt Animal</button>
                 </form>
               </td>
             </tr>
             <tr>
               <td colSpan='2'>
-                <h1 className='styled-heading'>Trasfer ERC20 from Admin </h1>
+                <h1 className='styled-heading'>Trasfer ERC20 from User </h1>
                 <form onSubmit={transfererc20}>
                   <label className='style-label'>
                     to:
@@ -459,14 +528,50 @@ export const User = () => {
             </tr>
           </tbody>
         </table>
+        <br />
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <h1 className='styled-heading'>Show My Adopted Animals</h1>
+                <form onSubmit={showAdoptedAnimals}>
+                  <button type='submit'>Show Animals</button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td >
+                <h1 className='styled-heading'>Adopted Animals</h1>
+                {adoptedAnimals.map((animal, index) => (
+                  <div key={index}>
+                    <h3>Name: {animal.name}</h3>
+                    <h3>ID: {animal.id}</h3>
+                    <p>Species: {animal.species}</p>
+                    <p>Description: {animal.description}</p>
+                    <p>Birthday: {animal.birthday}</p>
+                    <p>SanctuaryId: {animal.sanctuaryId}</p>
+                    <p>Guardian: {animal.guardian}</p>
+                    <p>GardianshipExpiry: {animal.gardianshipExpiry}</p>
+                    <p>GaurdianshipTokenId: {animal.gaurdianshipTokenId}</p>
+                  </div>
+                ))}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <hr />
-      <div className='MyContainer'>
-        <button onClick={setsanctuaries}>Show Sanctuaries</button>
-      </div>
+
       <div className='container'>
         <table className='table'>
           <tbody>
+            <tr>
+              <td>
+                <div className='MyContainer'>
+                  <button onClick={setsanctuaries}>Show All Sanctuaries</button>
+                </div>
+              </td>
+            </tr>
             <tr>
               <td>
                 <h1 className='styled-heading'>All Sanctuaries</h1>
@@ -483,6 +588,7 @@ export const User = () => {
             </tr>
           </tbody>
         </table>
+        <br />
         <table>
           <tbody>
             <tr>
@@ -491,12 +597,14 @@ export const User = () => {
                 <form onSubmit={showAnimalsToSanctuary}>
                   <label className='style-label'>
                     SanctuaryId:
-                    <input type='text' name='sanctuaryId' />
+                    <input type='number' name='sanctuaryId' min='1' />
                   </label>
                   <br />
                   <button type='submit'>Show Animals</button>
                 </form>
               </td>
+            </tr>
+            <tr>
               <td >
                 <h1 className='styled-heading'>All Animals In this Sanctuary</h1>
                 {animalsToSanctury.map((animal, index) => (
