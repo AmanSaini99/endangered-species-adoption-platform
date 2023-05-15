@@ -64,16 +64,14 @@ contract Controller is Ownable, SanctuaryManager {
     return animals[_animalId].gardianshipExpiry < block.timestamp;
   }
 
-  function getAlladoptedAnimals(
-    address account
-  ) public view returns (uint[] memory adoptedAnimalsIds) {
-    return users[account].adoptedAnimalsIds;
+  function getAlladoptedAnimals() public view returns (uint[] memory adoptedAnimalsIds) {
+    return users[msg.sender].adoptedAnimalsIds;
   }
 
   function burnExpiredTokens() public onlyOwner {
     for (uint i = 1; i < animals.length; i++) {
       if(animals[i].gaurdian == address(0)) continue;
-      if (isGaurdianshipExpired(i)) {
+      else if (isGaurdianshipExpired(i)) {
         gaurdianshipNFT.burnByController(animals[i].gaurdianshipTokenId);
         address gaurdian = animals[i].gaurdian;
         for (uint j = 0; j < users[gaurdian].gaurdianshipTokenIds.length; j++) {
